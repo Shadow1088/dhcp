@@ -9,10 +9,16 @@ const NodeTypes = {
 };
 
 class Node {
-  constructor(x, y, type) {
+  constructor(x, y, type, img) {
     this.x = x;
     this.y = y;
     this.type = type;
+    this.img = loadImage(`../img/${type}.png`);
+  }
+
+  draw() {
+    imageMode(CENTER); // Center the image on the node's position
+    image(this.img, this.x, this.y, 40, 40); // Adjust width and height as needed
   }
 }
 
@@ -178,14 +184,20 @@ function drawStatFields() {
 }
 
 function drawMainCanvas() {
+  push(); // Save current drawing context
   translate(100, 0);
-  connections.forEach((conn) => conn.draw());
-  nodes.forEach((node) => {
-    fill(255);
-    noStroke();
-    ellipse(node.x, node.y, 20, 20);
+
+  // Draw connections
+  connections.forEach((conn) => {
+    conn.draw(); // Ensure Connection.draw() only defines stroke and line
   });
-  resetMatrix();
+
+  // Draw nodes
+  nodes.forEach((node) => {
+    node.draw(); // Node's draw method handles its own image drawing
+  });
+
+  pop(); // Restore drawing context
 }
 
 function drawGUI() {
