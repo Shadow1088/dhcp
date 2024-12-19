@@ -1,13 +1,48 @@
 /// <reference path="../node_modules/@types/p5/global.d.ts" />
 
+////// global variables ///////
+// array's with all existing objects
+const buttons = [];
+const nodes = [];
+const connections = [];
 const nodeImages = {};
+// top bar's text informing what do buttons do or what you are meant to do
+let infoText = "Hover over an action for details!";
+// tells if you are currently in a GUI interface
+let showGUI = false;
+// if you have bought just now a node and still hover with it its equal to its type
+let currentHoverType = "";
+// toggleGUI required parameter - basically what are you doing within the sidebar
+let currentAction = "";
+// account network and broadcast address into total hosts limit
+let hosts_limit_constant = 2;
+// tells if you are currently placing a node
+let isPlacingNode = false;
+// tell if you are currently connecting devices
+let connecting = false;
+// variable required for connecting nodes - helps drawing a connection line while incomplete connection and
+let firstNode = null;
 
-// load all images
-function preload() {
-  Object.values(NodeTypes).forEach((type) => {
-    nodeImages[type] = loadImage(`../img/${type}.png`);
-  });
-}
+let upgrading = false;
+
+// each "important to see" field's status
+const stats = {
+  overload: 0.7,
+  latency: 0.01,
+  satisfaction: 0.85,
+  money: 0.5,
+};
+
+// stats that are not needed to be displayed
+const hidden_stats = {
+  attack_blocking_success_rate: 1,
+  upgrade_level: 0.1,
+  hosts_limit: 4,
+  hosts: nodes.length,
+  current_balance: 1000,
+  current_balance_limit: 1000,
+  baseNodeLevel: 1,
+};
 
 // node types
 const NodeTypes = {
@@ -19,16 +54,22 @@ const NodeTypes = {
 
 // node class - represents every node
 class Node {
-  constructor(x, y, type) {
+  constructor(x, y, type, level) {
     this.x = x;
     this.y = y;
     this.type = type;
     this.img = nodeImages[type];
+    this.level = level;
+    this.packetLimit = 10 * this.level;
   }
 
   draw() {
     imageMode(CENTER);
     image(this.img, this.x, this.y, 40, 40);
+
+    textSize(12);
+    textAlign("center");
+    text(`Level ${this.level}`, this.x, this.y + 30);
   }
 }
 
@@ -79,46 +120,6 @@ class IconButton {
   }
 }
 
-////// global variables ///////
-// array's with all existing nodes
-const buttons = [];
-const nodes = [];
-const connections = [];
-// top bar's text informing what do buttons do or what you are meant to do
-let infoText = "Hover over an action for details!";
-// tells if you are currently in a GUI interface
-let showGUI = false;
-// if you have bought just now a node and still hover with it its equal to its type
-let currentHoverType = "";
-// toggleGUI required parameter - basically what are you doing within the sidebar
-let currentAction = "";
-// account network and broadcast address into total hosts limit
-let hosts_limit_constant = 2;
-// tells if you are currently placing a node
-let isPlacingNode = false;
-// tell if you are currently connecting devices
-let connecting = false;
-// variable required for connecting nodes - helps drawing a connection line while incomplete connection and
-let firstNode = null;
-
-// each "important to see" field's status
-const stats = {
-  overload: 0.7,
-  latency: 0.01,
-  satisfaction: 0.85,
-  money: 0.5,
-};
-
-// stats that are not needed to be displayed
-const hidden_stats = {
-  attack_blocking_success_rate: 1,
-  upgrade_level: 0.1,
-  hosts_limit: 4,
-  hosts: nodes.length,
-  current_balance: 1000,
-  current_balance_limit: 1000,
-};
-
 // P5 setup function - called just once
 function setup() {
   createCanvas(1000, 700);
@@ -143,7 +144,12 @@ function draw() {
 
   // draw node's image while its placing
   if (isPlacingNode && currentHoverType != "") {
-    const tempNode = new Node(mouseX - 100, mouseY, currentHoverType);
+    const tempNode = new Node(
+      mouseX - 100,
+      mouseY,
+      currentHoverType,
+      hidden_stats.baseNodeLevel,
+    );
     push();
     translate(100, 0);
     tempNode.draw();
@@ -173,6 +179,13 @@ function draw() {
     drawGUIinterface();
     if (currentAction === "buy") drawBuyGUI();
   }
+}
+
+// load all images
+function preload() {
+  Object.values(NodeTypes).forEach((type) => {
+    nodeImages[type] = loadImage(`../img/${type}.png`);
+  });
 }
 
 function drawInfoBar() {
@@ -208,6 +221,11 @@ function initializeButtons() {
   );
   buttons.push(
     new IconButton(20, 160, "connect", "Connect two nodes", () => connect()),
+  );
+  buttons.push(
+    new IconButton(20, 220, "upgrade", "Increase node's level", () =>
+      upgrade(),
+    ),
   );
 }
 
@@ -279,7 +297,14 @@ function mousePressed() {
 
   // if hovering with the node you bought and you click, it places the node
   if (isPlacingNode && currentHoverType !== "" && mouseX > 100) {
-    nodes.push(new Node(mouseX - 100, mouseY, currentHoverType));
+    nodes.push(
+      new Node(
+        mouseX - 100,
+        mouseY,
+        currentHoverType,
+        hidden_stats.baseNodeLevel,
+      ),
+    );
     hidden_stats.hosts = nodes.length;
 
     isPlacingNode = false;
@@ -315,6 +340,13 @@ function mousePressed() {
           infoText = "Cannot connect node to itself!";
         }
       }
+    }
+  }
+  if (upgrading) {
+    const selectedNodeIndex = selectNode(mouseX - 100, mouseY);
+    if (selectedNodeIndex != -1) {
+      nodes[selectedNodeIndex].level += 1;
+      upgrading = false;
     }
   }
 }
@@ -434,6 +466,13 @@ function toggleGUI(action) {
     ? `Opened ${action} menu.`
     : "Hover over an action for details!";
   currentAction = showGUI ? action : "";
+}
+
+function upgrade() {
+  if (connecting == false && isPlacingNode == false) {
+    upgrading = true;
+    infoText = "Click a node to increase its level";
+  }
 }
 
 // change your stats based on your performance via sophisticated formulas
