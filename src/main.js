@@ -24,6 +24,10 @@ let connecting = false;
 let firstNode = null;
 
 let upgrading = false;
+// speed of passing packets - x seconds per packet pass
+let speed = 1.5;
+
+let frame = 0;
 
 // each "important to see" field's status
 const stats = {
@@ -61,6 +65,12 @@ class Node {
     this.img = nodeImages[type];
     this.level = level;
     this.packetLimit = 10 * this.level;
+    this.traffic = 0; // i/o packets
+    this.connections = [];
+    this.connectionsLimit = 4;
+    this.mac = generateMAC(); // array with neighbor mac addresses
+
+    this.FIB = {};
   }
 
   draw() {
@@ -69,7 +79,37 @@ class Node {
 
     textSize(12);
     textAlign("center");
-    text(`Level ${this.level}`, this.x, this.y + 30);
+    text(`Level ${this.level}`, this.x, this.y + 25);
+    text(this.mac, this.x, this.y + 45);
+  }
+
+  addConnection(connection) {
+    this.connections.push(connection);
+  }
+
+  arp() {
+    this.connections.forEach((connection, i) => {
+      if (connection.node1mac != this.mac) {
+        if (
+          (this.type == "switch2" || this.type == "server") &&
+          this.level < 5
+        ) {
+          this.FIB[`fa0/${i}`] = connection.node1mac;
+        } else {
+          this.FIB[`g0/${i}`] = connection.node1mac;
+        }
+      } else {
+        if (
+          (this.type == "switch2" || this.type == "server") &&
+          this.level < 5
+        ) {
+          this.FIB[`fa0/${i}`] = connection.node2mac;
+        } else {
+          this.FIB[`g0/${i}`] = connection.node2mac;
+        }
+      }
+    });
+    //console.log(`ARP table for ${this.mac}:`, this.FIB);
   }
 }
 
@@ -80,11 +120,14 @@ class Connection {
     this.y1 = node1.y;
     this.x2 = node2.x;
     this.y2 = node2.y;
+    this.node1mac = node1.mac;
+    this.node2mac = node2.mac;
   }
   draw() {
     stroke("orange");
     line(this.x1, this.y1, this.x2, this.y2);
   }
+  checkValidity() {}
 }
 
 // iconbutton class - basically every sidebar button
@@ -129,6 +172,7 @@ function setup() {
 
 // P5 draw function - called right after setup, runs infinitely
 function draw() {
+  frame = frame < 1000 ? frame + 1 : 0;
   // set canvas background color
   background(30);
   // change stats based on your performance
@@ -141,6 +185,13 @@ function draw() {
   drawInfoBar();
   // draw the playground
   drawMainCanvas();
+
+  if (frame % 200 == 0) {
+    nodes.forEach((node) => {
+      node.arp();
+      node.connectionsLimit = calculateConnectionLimit(node.type, node.level);
+    });
+  }
 
   // draw node's image while its placing
   if (isPlacingNode && currentHoverType != "") {
@@ -186,6 +237,26 @@ function preload() {
   Object.values(NodeTypes).forEach((type) => {
     nodeImages[type] = loadImage(`../img/${type}.png`);
   });
+}
+
+function calculateConnectionLimit(type, level) {
+  if (type != "router") {
+    return 4 * level;
+  } else {
+    return 4;
+  }
+}
+
+function generateMAC() {
+  const hex = "0123456789ABCDEF";
+  let output = "";
+  for (let i = 0; i < 12; ++i) {
+    output += hex.charAt(Math.floor(Math.random() * hex.length));
+    if ((i % 2) - 1 == 0 && i < 10) {
+      output += "-";
+    }
+  }
+  return output;
 }
 
 function drawInfoBar() {
@@ -315,10 +386,17 @@ function mousePressed() {
   // handles connecting nodes
   if (connecting) {
     // selects the node by returning its index in its array
-    const selectedNodeIndex = selectNode(mouseX - 100, mouseY);
-
-    // if clicked on a node
+    let selectedNodeIndex = selectNode(mouseX - 100, mouseY);
+    if (
+      selectedNodeIndex !== -1 &&
+      nodes[selectedNodeIndex].connections.length >=
+        nodes[selectedNodeIndex].connectionsLimit
+    ) {
+      infoText = "This node has reached its connection limit!";
+      selectedNodeIndex = -1;
+    }
     if (selectedNodeIndex != -1) {
+      // if clicked on a node
       // if selecting second node
       if (!firstNode) {
         firstNode = nodes[selectedNodeIndex];
@@ -330,7 +408,12 @@ function mousePressed() {
 
         // if successful connection
         if (firstNode != secondNode) {
-          connections.push(new Connection(firstNode, secondNode));
+          const connection = new Connection(firstNode, secondNode);
+          connections.push(connection);
+
+          firstNode.addConnection(connection);
+          secondNode.addConnection(connection);
+
           connecting = false;
           firstNode = null;
           infoText = "Connection created!";
@@ -475,13 +558,18 @@ function upgrade() {
   }
 }
 
+function collectOverload() {
+  let result = 0;
+
+  nodes.forEach((node, i) => {
+    result += nodes[i].traffic / nodes[i].packetLimit;
+  });
+  return result;
+}
+
 // change your stats based on your performance via sophisticated formulas
 function alternateStats() {
-  stats.overload =
-    hidden_stats.hosts /
-    (hidden_stats.hosts_limit - hosts_limit_constant) /
-    hidden_stats.upgrade_level ** hidden_stats.attack_blocking_success_rate /
-    10;
+  stats.overload = collectOverload();
   stats.latency = stats.overload ** 1.25;
   stats.satisfaction = 1 - (stats.latency ** 2 + Math.sqrt(stats.latency) / 5);
   stats.money =
