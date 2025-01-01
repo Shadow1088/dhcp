@@ -1,0 +1,20 @@
+notes started on 21.12.2024
+
+
+
+nodes have arp function which helps them learn their neighbors mac, however
+they should also be able to build their mac table based on frames that are passing through them
+
+
+
+as far as I understand - push and pop encapsulates all things from affecting other -
+for example "stroke"
+
+
+
+connections work like this:
+
+wait for first selected node
+draw line between node1.x, node1.y and mouseX, mouseY
+wait for second selected node
+add the connection

@@ -18,16 +18,18 @@ let currentAction = "";
 let hosts_limit_constant = 2;
 // tells if you are currently placing a node
 let isPlacingNode = false;
-// tell if you are currently connecting devices
+// tells if you are currently connecting devices
 let connecting = false;
 // variable required for connecting nodes - helps drawing a connection line while incomplete connection and
 let firstNode = null;
+// tells if you are currently moving a node
+let moving = false;
 
 let upgrading = false;
-// speed of passing packets - x seconds per packet pass
+// speed of passing frames - x seconds per frame pass
 let speed = 1.5;
 
-let frame = 0;
+let iteration = 0;
 
 // each "important to see" field's status
 const stats = {
@@ -54,7 +56,30 @@ const NodeTypes = {
   ROUTER: "router",
   SWITCH2: "switch2",
   SWITCH3: "switch3",
+  CLIENT: "client",
 };
+
+// simplyfied Frame
+class Frame {
+  constructor(dMAC, sMAC, dIP, sIP, protocol, vlan) {
+    this.dMAC = dMAC;
+    this.sMAC = sMAC;
+    this.dIP = dIP;
+    this.sIP = sIP;
+    this.direction = "in";
+    this.protocol = protocol;
+    this.vlan = vlan;
+  }
+}
+
+class Interface {
+  constructor(prefix, id, mac, state, connection) {
+    this.prefix = prefix;
+    this.id = id;
+    this.mac = mac;
+    this.state = state;
+  }
+}
 
 // node class - represents every node
 class Node {
@@ -64,13 +89,14 @@ class Node {
     this.type = type;
     this.img = nodeImages[type];
     this.level = level;
-    this.packetLimit = 10 * this.level;
-    this.traffic = 0; // i/o packets
-    this.connections = [];
+    this.frameLimit = 10 * this.level;
+    this.frames = [];
+    this.connections = []; // array with neighbor mac addresses
     this.connectionsLimit = 4;
-    this.mac = generateMAC(); // array with neighbor mac addresses
-
+    this.mac = generateMAC();
+    this.prefix = "";
     this.FIB = {};
+    this.dragged = false;
   }
 
   draw() {
@@ -84,8 +110,15 @@ class Node {
   }
 
   addConnection(connection) {
-    this.connections.push(connection);
+    this.connections[this.connections.length] = new Interface(this.prefix);
   }
+
+  changePrefix() {
+    switch (this.type) {
+      case "router":
+        null;
+    }
+  } // TODO: Finish later interfaces and conenctions array
 
   arp() {
     this.connections.forEach((connection, i) => {
@@ -94,23 +127,32 @@ class Node {
           (this.type == "switch2" || this.type == "server") &&
           this.level < 5
         ) {
-          this.FIB[`fa0/${i}`] = connection.node1mac;
+          this.prefix = "fa";
+          this.FIB[`${this.prefix}0/${i}`] = connection.node1mac;
         } else {
-          this.FIB[`g0/${i}`] = connection.node1mac;
+          this.prefix = "g";
+          this.FIB[`${this.prefix}0/${i}`] = connection.node1mac;
         }
       } else {
         if (
           (this.type == "switch2" || this.type == "server") &&
           this.level < 5
         ) {
-          this.FIB[`fa0/${i}`] = connection.node2mac;
+          this.prefix = "fa";
+          this.FIB[`${this.prefix}0/${i}`] = connection.node2mac;
         } else {
-          this.FIB[`g0/${i}`] = connection.node2mac;
+          this.prefix = "g";
+          this.FIB[`${this.prefix}0/${i}`] = connection.node2mac;
         }
       }
     });
-    //console.log(`ARP table for ${this.mac}:`, this.FIB);
+    //console.log(`MAC table for ${this.mac}:`, this.FIB);
   }
+
+  // goes through all Frames
+  handleFrame(frame, index) {}
+
+  forwardFrame() {}
 }
 
 // connection class - represents every connection
@@ -126,6 +168,7 @@ class Connection {
   draw() {
     stroke("orange");
     line(this.x1, this.y1, this.x2, this.y2);
+    noStroke();
   }
   checkValidity() {}
 }
@@ -172,7 +215,7 @@ function setup() {
 
 // P5 draw function - called right after setup, runs infinitely
 function draw() {
-  frame = frame < 1000 ? frame + 1 : 0;
+  iteration = iteration < 1000 ? iteration + 1 : 0;
   // set canvas background color
   background(30);
   // change stats based on your performance
@@ -186,7 +229,7 @@ function draw() {
   // draw the playground
   drawMainCanvas();
 
-  if (frame % 200 == 0) {
+  if (iteration % 200 == 0) {
     nodes.forEach((node) => {
       node.arp();
       node.connectionsLimit = calculateConnectionLimit(node.type, node.level);
@@ -214,8 +257,6 @@ function draw() {
 
   // draw line while unfinished connecting
   if (connecting && firstNode) {
-    // as far as I understand - push and pop encapsulates all things from affecting other -
-    //  for example "stroke"
     push();
 
     translate(100, 0);
@@ -241,6 +282,9 @@ function preload() {
 
 function calculateConnectionLimit(type, level) {
   if (type != "router") {
+    if (type == "client") {
+      return 1;
+    }
     return 4 * level;
   } else {
     return 4;
@@ -363,7 +407,7 @@ function selectNode(x, y) {
 
 // P5's built-in callback function - whenever you click P5 calls this function
 function mousePressed() {
-  // handles click -> if its however and you click it executes its associated function
+  // handles click -> if its hovevered and you click it executes its associated function
   buttons.forEach((button) => button.handleClick());
 
   // if hovering with the node you bought and you click, it places the node
@@ -395,8 +439,8 @@ function mousePressed() {
       infoText = "This node has reached its connection limit!";
       selectedNodeIndex = -1;
     }
+    // if clicked on a node
     if (selectedNodeIndex != -1) {
-      // if clicked on a node
       // if selecting second node
       if (!firstNode) {
         firstNode = nodes[selectedNodeIndex];
@@ -432,15 +476,51 @@ function mousePressed() {
       upgrading = false;
     }
   }
+
+  // if none of buttons selected and a node is selected we suppose user intends to drag the node
+  if (!connecting && !upgrading && !isPlacingNode) {
+    const selectedNodeIndex = selectNode(mouseX - 100, mouseY);
+    if (selectedNodeIndex != -1) {
+      moving = true;
+      nodes[selectedNodeIndex].dragged = true;
+    }
+  }
 }
 
-// connections work like this:
-//
-// wait for first selected node
-// draw line between node1.x, node1.y and mouseX, mouseY
-// wait for second selected node
-// add the connection
+function mouseDragged() {
+  if (moving) {
+    const draggedNode = nodes.find((node) => node.dragged);
+    if (draggedNode) {
+      const newX = mouseX - 100;
+      const newY = mouseY;
 
+      if (newX >= 30 && newX <= 870 && newY >= 30 && newY <= 670) {
+        draggedNode.x = newX;
+        draggedNode.y = newY;
+
+        connections.forEach((conn) => {
+          if (conn.node1mac === draggedNode.mac) {
+            conn.x1 = draggedNode.x;
+            conn.y1 = draggedNode.y;
+          }
+          if (conn.node2mac === draggedNode.mac) {
+            conn.x2 = draggedNode.x;
+            conn.y2 = draggedNode.y;
+          }
+        });
+      }
+    }
+  }
+}
+
+function checkOutOfBounds() {}
+
+function mouseReleased() {
+  if (moving) {
+    nodes.forEach((node) => (node.dragged = false));
+    moving = false;
+  }
+}
 // sets connection to true and displays a text
 function connect() {
   connecting = true;
@@ -474,6 +554,7 @@ function drawBuyGUI() {
     { type: NodeTypes.ROUTER, cost: 100 },
     { type: NodeTypes.SWITCH2, cost: 80 },
     { type: NodeTypes.SWITCH3, cost: 400 },
+    { type: NodeTypes.CLIENT, cost: 50 },
   ];
 
   buyableItems.forEach((item, index) => {
@@ -562,7 +643,7 @@ function collectOverload() {
   let result = 0;
 
   nodes.forEach((node, i) => {
-    result += nodes[i].traffic / nodes[i].packetLimit;
+    result += nodes[i].frames.length / nodes[i].frameLimit;
   });
   return result;
 }
