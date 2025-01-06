@@ -16,7 +16,7 @@ const IMAGES = {
   switchL3: null,
   upgrade: null,
   mainscreen: null,
-  viewchallenges: null,
+  switchtochallengepicker: null,
 };
 
 const SCENES = {};
