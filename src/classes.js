@@ -1,19 +1,21 @@
 // Main screen? Challenge picker? Playground? (network building)
+
 class Scene {
   constructor(type) {
     this.type = type;
-    if (this.type === "mainscreen") {
-      buttons.push(
-        new Button(
-          windowWidth / 2,
-          (windowHeight / 5) * 4.7,
-          680,
-          90,
-          "switchtochallengepicker",
-          () => switchToChallengePicker(),
-          "Whats your next challenge?",
-        ),
-      );
+    switch (this.type) {
+      case "mainscreen":
+        buttons.push(
+          new Button(
+            windowWidth / 2,
+            (windowHeight / 5) * 4.7,
+            680,
+            90,
+            "switchtochallengepicker",
+            () => switchToChallengePicker(),
+            "Whats your next challenge?",
+          ),
+        );
     }
   }
 }
@@ -51,12 +53,16 @@ class ChallengePicker extends Scene {
   }
   draw() {
     imageMode(CORNER);
-    image(this.background_img, 0, 0, windowWidth, windowHeight);
+    image(
+      this.background_img,
+      -1000 + challengebgnum,
+      0,
+      windowWidth + 1000,
+      windowHeight,
+    );
+    drawChallengeNet();
   }
 }
-
-// Draw all the nodes, notes, info.
-class Challenge {}
 
 class Button {
   constructor(x, y, w, h, action, onClick, text) {
@@ -81,14 +87,48 @@ class Button {
 
   isHovered() {
     return (
-      mouseX > this.x &&
-      mouseX < this.x + this.w &&
-      mouseY > this.y &&
-      mouseY < this.y + this.h
+      mouseX > this.x - this.w / 2 &&
+      mouseX < this.x + this.w / 2 &&
+      mouseY > this.y - this.h / 2 &&
+      mouseY < this.y + this.h / 2
     );
   }
 
   handleClick() {
     if (this.isHovered()) this.onClick();
+  }
+}
+
+class Node {
+  constructor(x, y, type) {
+    this.x = x;
+    this.y = y;
+    this.type = type;
+    this.mac = generateMAC();
+    this.img = IMAGES[NodeTypes[type]];
+    this.interfaces = {}; //"0/1":connection?
+  }
+  draw() {
+    imageMode(CENTER);
+    image(this.img, this.x, this.y, 40, 40);
+
+    textSize(12);
+    textAlign("center");
+
+    text(this.mac, this.x, this.y + 45);
+  }
+}
+
+// Draw all the nodes, notes, info.
+class Challenge {}
+
+class Creation extends Scene {
+  constructor() {
+    super("creation");
+  }
+  draw() {
+    push();
+    fill("grey");
+    pop();
   }
 }

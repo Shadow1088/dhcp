@@ -6,6 +6,10 @@ function setup() {
 }
 
 function draw() {
+  iteration = iteration < 1000 ? iteration + 1 : 0;
+
+  challengebgnum = challengebg() ? challengebgnum - 1 : challengebgnum + 1;
+
   // draw active scene
   SCENES[SCENES["active"]].draw();
 
