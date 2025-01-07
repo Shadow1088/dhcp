@@ -18,6 +18,7 @@ const IMAGES = {
   mainscreen: null,
   switchtochallengepicker: null,
   challengepicker: null,
+  challenge: null,
 };
 
 const SCENES = {};
@@ -35,3 +36,4 @@ let buttons = [];
 let iteration = 0;
 let challengebgnum = 1;
 let challengebgmoving = false;
+let circlePositions = [];

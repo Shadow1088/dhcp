@@ -74,15 +74,20 @@ class Button {
     this.action = action;
     this.onClick = onClick;
     this.text = text;
+    this.clicked = false;
+    this.branchesCreated = false;
   }
 
   draw() {
     imageMode(CENTER);
     image(this.img, this.x, this.y, this.w, this.h);
-
+    if (this.action === "challenge") {
+      stroke("black");
+    }
     textSize(25);
     textAlign(CENTER, CENTER);
     text(this.text, this.x, this.y);
+    noStroke();
   }
 
   isHovered() {
