@@ -18,7 +18,7 @@ const IMAGES = {
   mainscreen: null,
   switchtochallengepicker: null,
   challengepicker: null,
-  challenge: null,
+  challengebutton: null,
 };
 
 const SCENES = {};

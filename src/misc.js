@@ -11,7 +11,7 @@ function initChallengePositions() {
         rand_y,
         90,
         90,
-        "challenge",
+        "challengebutton",
         () => topicClicked(i),
         Object.keys(challenges)[i],
       ),
@@ -21,7 +21,8 @@ function initChallengePositions() {
 
 function drawClickedChallengeBranches() {
   for (let i = 0; i < buttons.length; i++) {
-    if (buttons[i].clicked) {
+    if (buttons[i].clicked && !buttons[i].branchesCreated) {
+      // Create buttons once when clicked
       let len = Object.keys(challenges[Object.keys(challenges)[i]]).length;
       let degs = 360 / len;
       let gap = 120;
@@ -30,34 +31,37 @@ function drawClickedChallengeBranches() {
         let angle = radians(degs * j);
         let newX = buttons[i].x + gap * cos(angle);
         let newY = buttons[i].y + gap * sin(angle);
+        let type =
+          Object.keys(challenges)[i] === "CREATE" ? "creation" : "challenge";
 
-        // Draw circle
-        push();
-        fill("white");
-        circle(newX, newY, 80);
-        pop();
-
-        // Create button once
-        if (!buttons[i].branchesCreated) {
-          buttons.push(
-            new Button(
-              newX,
-              newY,
-              70,
-              70,
-              "challenge",
-              () => loadChallenge(),
-              j,
-            ),
-          );
-        }
+        let branchButton = new Button(
+          newX,
+          newY,
+          60,
+          60,
+          "challengebutton",
+          () => loadChallenge(type),
+          j,
+        );
+        branchButton.parentIndex = i;
+        branchButton.isBranch = true; // Add this flag
+        buttons.push(branchButton);
       }
       buttons[i].branchesCreated = true;
-    } else if (buttons[i].branchesCreated) {
-      // Only remove branches if they were created
+    } else if (!buttons[i].clicked && buttons[i].branchesCreated) {
       buttons[i].branchesCreated = false;
-      // Remove only branches associated with this button
       buttons = buttons.filter((button) => button.parentIndex !== i);
+    }
+    // Draw lines if button is clicked
+    if (buttons[i].clicked) {
+      push();
+      stroke("white");
+      buttons.forEach((button) => {
+        if (button.isBranch && button.parentIndex === i) {
+          line(button.x, button.y, buttons[i].x, buttons[i].y);
+        }
+      });
+      pop();
     }
   }
 }

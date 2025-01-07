@@ -3,6 +3,8 @@ function setup() {
   SCENES["active"] = "mainscreen";
   SCENES["mainscreen"] = new MainScreen("mainscreen");
   SCENES["challengePicker"] = new ChallengePicker("challengepicker");
+  SCENES["creation"] = new Creation();
+  SCENES["challenge"] = new Challenge();
 }
 
 function draw() {

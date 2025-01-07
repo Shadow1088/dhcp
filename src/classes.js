@@ -81,7 +81,7 @@ class Button {
   draw() {
     imageMode(CENTER);
     image(this.img, this.x, this.y, this.w, this.h);
-    if (this.action === "challenge") {
+    if (this.action === "challengebutton") {
       stroke("black");
     }
     textSize(25);
@@ -133,7 +133,8 @@ class Creation extends Scene {
   }
   draw() {
     push();
-    fill("grey");
+
+    background("grey");
     pop();
   }
 }

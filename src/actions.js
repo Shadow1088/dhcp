@@ -5,8 +5,8 @@ function switchToChallengePicker() {
   initChallengePositions();
 }
 
-function loadChallenge() {
-  SCENES["active"] = "challenge";
+function loadChallenge(type) {
+  SCENES["active"] = type;
   buttons = [];
 }
 
