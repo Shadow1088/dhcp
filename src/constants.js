@@ -5,10 +5,10 @@ const MODES = {};
 const STATES = {};
 
 const IMAGES = {
-  buy: null,
+  creationaddbutton: null,
   client: null,
-  connect: null,
-  delete: null,
+  creationconnectbutton: null,
+  creationdeletebutton: null,
   router: null,
   server: null,
   simulate: null,
@@ -37,3 +37,6 @@ let iteration = 0;
 let challengebgnum = 1;
 let challengebgmoving = false;
 let circlePositions = [];
+
+let tempnode = null;
+let drawgui = null;

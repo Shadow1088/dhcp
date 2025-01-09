@@ -13,3 +13,7 @@ function loadChallenge(type) {
 function topicClicked(index) {
   buttons[index].clicked = !buttons[index].clicked;
 }
+
+function connectNode() {}
+
+function deleteNode() {}

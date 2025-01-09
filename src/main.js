@@ -19,6 +19,10 @@ function draw() {
   for (let i = 0; i < buttons.length; i++) {
     buttons[i].draw();
   }
+  if (tempnode && !tempnode.finished) {
+    tempnode.update();
+    tempnode.draw();
+  }
 }
 
 function windowResized() {
@@ -29,5 +33,10 @@ function mouseClicked() {
   // check if a button was clicked
   for (let i = 0; i < buttons.length; i++) {
     buttons[i].handleClick();
+  }
+  if (SCENES[SCENES["active"]] && SCENES[SCENES["active"]].buttons) {
+    Object.values(SCENES[SCENES["active"]].buttons).forEach((button) => {
+      button.handleClick();
+    });
   }
 }

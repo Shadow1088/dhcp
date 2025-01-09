@@ -118,9 +118,26 @@ class Node {
     image(this.img, this.x, this.y, 40, 40);
 
     textSize(12);
-    textAlign("center");
+    textAlign(CENTER);
 
     text(this.mac, this.x, this.y + 45);
+  }
+}
+
+// created once a button in addNode clicked - creator (user) after choosing the node still needs to decide where to place it
+// and so a fake copy of the node is drawn out on the screen, once creator (user) clicks, it creates real Node with temp node's properties
+class tempNode extends Node {
+  constructor(type) {
+    super(mouseX, mouseY, type);
+    this.finished = false; // placed the node?
+  }
+  draw() {
+    imageMode(CENTER);
+    image(this.img, this.x, this.y, 40, 40);
+
+    textSize(12);
+    textAlign("center");
+    text(this.mac, this.x, this.y + 25);
   }
 }
 
@@ -130,11 +147,48 @@ class Challenge {}
 class Creation extends Scene {
   constructor() {
     super("creation");
+    this.buttons = {
+      add: new Button(
+        60,
+        60,
+        90,
+        90,
+        "creationaddbutton",
+        (drawgui = () => addNodeGUI()),
+        "",
+      ),
+      delete: new Button(
+        75,
+        180,
+        90,
+        90,
+        "creationdeletebutton",
+        () => deleteNode(),
+        "",
+      ),
+      connect: new Button(
+        75,
+        300,
+        90,
+        90,
+        "creationconnectbutton",
+        () => connectNode(),
+        "",
+      ),
+    };
   }
   draw() {
     push();
 
     background("grey");
+    fill("black");
+    rect(0, 0, 150, windowHeight);
+
+    imageMode(CENTER);
+    for (let i = 0; i < Object.keys(this.buttons).length; i++) {
+      this.buttons[Object.keys(this.buttons)[i]].draw();
+    }
+
     pop();
   }
 }
