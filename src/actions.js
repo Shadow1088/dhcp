@@ -14,17 +14,7 @@ function loadChallenge(type) {
 }
 
 function loadCreation() {
-  buttons.push(
-    new Button(
-      60,
-      60,
-      90,
-      90,
-      "creationaddbutton",
-      (drawgui = () => addNodeGUI()),
-      "",
-    ),
-  );
+  buttons.push(new Button(60, 60, 90, 90, "creationaddbutton", addNodeGUI, ""));
   buttons.push(
     new Button(75, 180, 90, 90, "creationdeletebutton", () => deleteNode(), ""),
   );

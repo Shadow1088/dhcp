@@ -23,7 +23,7 @@ function draw() {
     tempnode.update();
     tempnode.draw();
   }
-  if (drawgui) {
+  if (drawgui != null) {
     drawgui();
   }
 }
@@ -36,10 +36,5 @@ function mouseClicked() {
   // check if a button was clicked
   for (let i = 0; i < buttons.length; i++) {
     buttons[i].handleClick();
-  }
-  if (SCENES[SCENES["active"]] && SCENES[SCENES["active"]].buttons) {
-    Object.values(SCENES[SCENES["active"]].buttons).forEach((button) => {
-      button.handleClick();
-    });
   }
 }

@@ -101,6 +101,9 @@ class Button {
 
   handleClick() {
     if (this.isHovered()) this.onClick();
+    if (this.action == "creationaddbutton") {
+      drawgui = () => addNodeGUI();
+    }
   }
 }
 
