@@ -23,6 +23,9 @@ function draw() {
     tempnode.update();
     tempnode.draw();
   }
+  if (drawgui) {
+    drawgui();
+  }
 }
 
 function windowResized() {

@@ -1,5 +1,4 @@
 function addNodeGUI() {
-  console.log(1);
   let w = 100;
   push();
   fill("red");

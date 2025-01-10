@@ -1,4 +1,4 @@
-// Main screen? Challenge picker? Playground? (network building)
+// Main screen? Challenge picker? Playground?
 
 class Scene {
   constructor(type) {
@@ -147,35 +147,6 @@ class Challenge {}
 class Creation extends Scene {
   constructor() {
     super("creation");
-    this.buttons = {
-      add: new Button(
-        60,
-        60,
-        90,
-        90,
-        "creationaddbutton",
-        (drawgui = () => addNodeGUI()),
-        "",
-      ),
-      delete: new Button(
-        75,
-        180,
-        90,
-        90,
-        "creationdeletebutton",
-        () => deleteNode(),
-        "",
-      ),
-      connect: new Button(
-        75,
-        300,
-        90,
-        90,
-        "creationconnectbutton",
-        () => connectNode(),
-        "",
-      ),
-    };
   }
   draw() {
     push();
@@ -185,9 +156,6 @@ class Creation extends Scene {
     rect(0, 0, 150, windowHeight);
 
     imageMode(CENTER);
-    for (let i = 0; i < Object.keys(this.buttons).length; i++) {
-      this.buttons[Object.keys(this.buttons)[i]].draw();
-    }
 
     pop();
   }
