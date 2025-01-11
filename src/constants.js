@@ -26,8 +26,8 @@ const SCENES = {};
 const NodeTypes = {
   SERVER: "server",
   ROUTER: "router",
-  SWITCH2: "switch2",
-  SWITCH3: "switch3",
+  SWITCH2: "switchL2",
+  SWITCH3: "switchL3",
   CLIENT: "client",
 };
 
@@ -40,3 +40,4 @@ let circlePositions = [];
 
 let tempnode = null;
 let drawgui = null;
+let guibuttons = [];

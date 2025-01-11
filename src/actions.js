@@ -14,14 +14,14 @@ function loadChallenge(type) {
 }
 
 function loadCreation() {
-  buttons.push(new Button(60, 60, 90, 90, "creationaddbutton", addNodeGUI, ""));
+  buttons.push(new Button(75, 75, 90, 90, "creationaddbutton", addNodeGUI, ""));
   buttons.push(
-    new Button(75, 180, 90, 90, "creationdeletebutton", () => deleteNode(), ""),
+    new Button(75, 195, 90, 90, "creationdeletebutton", () => deleteNode(), ""),
   );
   buttons.push(
     new Button(
       75,
-      300,
+      315,
       90,
       90,
       "creationconnectbutton",
@@ -38,3 +38,8 @@ function topicClicked(index) {
 function connectNode() {}
 
 function deleteNode() {}
+
+function tempNodeFunc(type) {
+  tempnode = new TempNode(type);
+  drawgui = null;
+}

@@ -19,11 +19,15 @@ function draw() {
   for (let i = 0; i < buttons.length; i++) {
     buttons[i].draw();
   }
+
   if (tempnode && !tempnode.finished) {
-    tempnode.update();
     tempnode.draw();
+    tempnode.update();
   }
   if (drawgui != null) {
+    for (let i = 0; i < guibuttons.length; i++) {
+      guibuttons[i].draw();
+    }
     drawgui();
   }
 }

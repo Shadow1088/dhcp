@@ -129,7 +129,7 @@ class Node {
 
 // created once a button in addNode clicked - creator (user) after choosing the node still needs to decide where to place it
 // and so a fake copy of the node is drawn out on the screen, once creator (user) clicks, it creates real Node with temp node's properties
-class tempNode extends Node {
+class TempNode extends Node {
   constructor(type) {
     super(mouseX, mouseY, type);
     this.finished = false; // placed the node?
@@ -150,11 +150,14 @@ class Challenge {}
 class Creation extends Scene {
   constructor() {
     super("creation");
+    this.nodes = [];
+    this.connection = [];
   }
   draw() {
     push();
 
     background("grey");
+
     fill("black");
     rect(0, 0, 150, windowHeight);
 
@@ -162,4 +165,5 @@ class Creation extends Scene {
 
     pop();
   }
+  update() {}
 }
