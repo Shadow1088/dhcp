@@ -1,3 +1,12 @@
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  SCENES["active"] = "mainscreen";
+  SCENES["mainscreen"] = new MainScreen("mainscreen");
+  SCENES["challengePicker"] = new ChallengePicker("challengepicker");
+  SCENES["creation"] = new Creation();
+  SCENES["challenge"] = new Challenge();
+}
+
 function switchToChallengePicker() {
   // previous scene clearing
   SCENES["active"] = "challengePicker";
@@ -40,6 +49,24 @@ function connectNode() {}
 function deleteNode() {}
 
 function tempNodeFunc(type) {
-  tempnode = new TempNode(type);
   drawgui = null;
+  guibuttons = [];
+  tempnode = new TempNode(type);
+}
+
+function moveNode() {}
+
+function selectNode(x, y) {
+  let selectedIndex = -1;
+  for (let i = 0; i < nodes.length; i++) {
+    if (
+      x >= nodes[i].x - 30 &&
+      x <= nodes[i].x + 30 &&
+      y >= nodes[i].y - 30 &&
+      y <= nodes[i].y + 30
+    ) {
+      selectedIndex = i;
+    }
+  }
+  return selectedIndex;
 }

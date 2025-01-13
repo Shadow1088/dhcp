@@ -8,13 +8,14 @@ function addNodeGUI() {
   push();
   fill(81, 81, 81, 40);
   rect(gui_x, gui_y, gui_width, gui_height);
+
   pop();
 }
 
 function addNodeGUIcreateChoices(gui_x, gui_y, gui_width, gui_height) {
   guibuttons = [];
   let len = Object.keys(NodeTypes).length; // amount of defined nodes
-  let gap = 30;
+  let gap = 50;
   let size = 70; // icon size
   let row = Math.floor(gui_width / (size + gap)); // items per row
 
@@ -39,6 +40,8 @@ function addNodeGUIcreateChoices(gui_x, gui_y, gui_width, gui_height) {
       () => tempNodeFunc(NodeTypes[Object.keys(NodeTypes)[i]]),
       "",
     );
+    textAlign(CENTER, CENTER);
+    text(NodeTypes[Object.keys(NodeTypes)[i]], x, y + size);
     guibuttons.push(button);
   }
 }

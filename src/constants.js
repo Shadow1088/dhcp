@@ -1,5 +1,3 @@
-const TOPICS = {};
-
 const MODES = {};
 
 const STATES = {};
@@ -41,3 +39,8 @@ let circlePositions = [];
 let tempnode = null;
 let drawgui = null;
 let guibuttons = [];
+
+let nodes = [];
+
+// if drawgui isnt null action = "gui", else if drawgui is null and tempnode isnt null then action="placing", else action="null"
+let action = null;

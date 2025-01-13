@@ -9,36 +9,71 @@ function setup() {
 
 function draw() {
   iteration = iteration < 1000 ? iteration + 1 : 0;
-
   challengebgnum = challengebg() ? challengebgnum - 1 : challengebgnum + 1;
 
-  // draw active scene
+  action =
+    drawgui != null
+      ? "gui"
+      : tempnode != null
+        ? "placing"
+        : action == "moving"
+          ? "moving"
+          : null;
+
   SCENES[SCENES["active"]].draw();
 
-  // draw buttons
   for (let i = 0; i < buttons.length; i++) {
     buttons[i].draw();
   }
 
-  if (tempnode && !tempnode.finished) {
+  if (tempnode) {
     tempnode.draw();
     tempnode.update();
   }
+
   if (drawgui != null) {
+    drawgui();
     for (let i = 0; i < guibuttons.length; i++) {
       guibuttons[i].draw();
     }
-    drawgui();
+  }
+  if (nodes.length) {
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].draw();
+    }
   }
 }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
-
 function mouseClicked() {
+  if (tempnode) {
+    tempnode.finished = true;
+  }
+
   // check if a button was clicked
   for (let i = 0; i < buttons.length; i++) {
     buttons[i].handleClick();
+  }
+
+  for (let i = 0; i < guibuttons.length; i++) {
+    guibuttons[i].handleClick();
+  }
+}
+
+function mousePressed() {
+  if (action == null) {
+    node = selectNode(mouseX, mouseY);
+    console.log(node);
+    if (selectedNode != -1) {
+      action = "moving";
+    }
+  }
+
+  if (action == "moving") {
+  }
+}
+
+function mouseReleased() {
+  if (action == "moving") {
+    action = null;
   }
 }

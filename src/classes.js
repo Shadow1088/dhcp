@@ -101,7 +101,7 @@ class Button {
 
   handleClick() {
     if (this.isHovered()) this.onClick();
-    if (this.action == "creationaddbutton") {
+    if (this.action == "creationaddbutton" && this.isHovered()) {
       drawgui = () => addNodeGUI();
     }
   }
@@ -113,7 +113,7 @@ class Node {
     this.y = y;
     this.type = type;
     this.mac = generateMAC();
-    this.img = IMAGES[NodeTypes[type]];
+    this.img = IMAGES[type];
     this.interfaces = {}; //"0/1":connection?
   }
   draw() {
@@ -123,7 +123,7 @@ class Node {
     textSize(12);
     textAlign(CENTER);
 
-    text(this.mac, this.x, this.y + 45);
+    text(this.mac, this.x, this.y + 30);
   }
 }
 
@@ -140,7 +140,15 @@ class TempNode extends Node {
 
     textSize(12);
     textAlign("center");
-    text(this.mac, this.x, this.y + 25);
+    text(this.mac, this.x, this.y + 30);
+  }
+  update() {
+    this.x = mouseX;
+    this.y = mouseY;
+    if (this.finished) {
+      nodes.push(new Node(this.x, this.y, this.type));
+      tempnode = null;
+    }
   }
 }
 
