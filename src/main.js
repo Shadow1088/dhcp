@@ -61,8 +61,8 @@ function mouseClicked() {
 
 function mousePressed() {
   if (action == null) {
-    node = selectNode(mouseX, mouseY);
-    console.log(node);
+    selectedNode = selectNode(mouseX, mouseY);
+    console.log(selectedNode);
     if (selectedNode != -1) {
       action = "moving";
     }
