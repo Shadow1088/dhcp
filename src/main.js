@@ -89,3 +89,7 @@ function mouseReleased() {
     action = null;
   }
 }
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
