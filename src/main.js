@@ -42,6 +42,11 @@ function draw() {
       nodes[i].draw();
     }
   }
+
+  if (action == "moving") {
+    nodes[selectedNode].x = mouseX;
+    nodes[selectedNode].y = mouseY;
+  }
 }
 
 function mouseClicked() {
@@ -66,9 +71,6 @@ function mousePressed() {
     if (selectedNode != -1) {
       action = "moving";
     }
-  }
-
-  if (action == "moving") {
   }
 }
 
