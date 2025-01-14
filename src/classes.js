@@ -112,7 +112,7 @@ class Node {
     this.x = x;
     this.y = y;
     this.type = type;
-    this.mac = generateMAC();
+    this.ip = "192.168.1.x";
     this.img = IMAGES[type];
     this.interfaces = {}; //"0/1":connection?
   }
@@ -123,7 +123,7 @@ class Node {
     textSize(12);
     textAlign(CENTER);
 
-    text(this.mac, this.x, this.y + 30);
+    text(this.ip, this.x, this.y + 30);
   }
 }
 
@@ -140,7 +140,7 @@ class TempNode extends Node {
 
     textSize(12);
     textAlign("center");
-    text(this.mac, this.x, this.y + 30);
+    text(this.ip, this.x, this.y + 30);
   }
   update() {
     this.x = mouseX;

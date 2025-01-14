@@ -42,7 +42,7 @@ function loadCreation() {
       90,
       90,
       "creationconnectbutton",
-      () => connectNode(),
+      () => (action = "connecting"),
       "",
     ),
   );
@@ -53,8 +53,6 @@ function topicClicked(index) {
 }
 
 function connectNode() {}
-
-function deleteNode() {}
 
 function tempNodeFunc(type) {
   drawgui = null;

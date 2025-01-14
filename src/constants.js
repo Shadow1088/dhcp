@@ -36,9 +36,12 @@ let challengebgnum = 1;
 let challengebgmoving = false;
 let circlePositions = [];
 
+let tempconnnode = null;
+let tempconn = null;
 let tempnode = null;
 let drawgui = null;
 let guibuttons = [];
+let connections = [];
 
 let nodes = [];
 let selectedNode = null;
