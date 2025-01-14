@@ -18,7 +18,9 @@ function draw() {
         ? "placing"
         : action == "moving"
           ? "moving"
-          : null;
+          : action == "deleting"
+            ? "deleting"
+            : null;
 
   SCENES[SCENES["active"]].draw();
 
@@ -52,6 +54,14 @@ function draw() {
 function mouseClicked() {
   if (tempnode) {
     tempnode.finished = true;
+  }
+
+  if (action == "deleting") {
+    selectedNode = selectNode(mouseX, mouseY);
+    if (selectedNode != -1) {
+      deleteNode(selectedNode);
+      action = null;
+    }
   }
 
   // check if a button was clicked

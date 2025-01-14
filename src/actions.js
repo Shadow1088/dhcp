@@ -25,7 +25,15 @@ function loadChallenge(type) {
 function loadCreation() {
   buttons.push(new Button(75, 75, 90, 90, "creationaddbutton", addNodeGUI, ""));
   buttons.push(
-    new Button(75, 195, 90, 90, "creationdeletebutton", () => deleteNode(), ""),
+    new Button(
+      75,
+      195,
+      90,
+      90,
+      "creationdeletebutton",
+      () => (action = "deleting"),
+      "",
+    ),
   );
   buttons.push(
     new Button(
@@ -69,4 +77,8 @@ function selectNode(x, y) {
     }
   }
   return selectedIndex;
+}
+
+function deleteNode(index) {
+  nodes.splice(index, 1);
 }
