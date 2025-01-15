@@ -64,11 +64,13 @@ function draw() {
       const key = Object.keys(connections).find((k) => connections[k] === conn); // Find the key for the connection
 
       if (conn.mac1 == mac) {
-        conn.x1 = nodes[selectedNode].x1;
-        conn.y1 = nodes[selectedNode].y1;
+        console.log(0);
+        conn.x1 = nodes[selectedNode].x;
+        conn.y1 = nodes[selectedNode].y;
       } else if (conn.mac2 == mac) {
-        conn.x2 = nodes[selectedNode].x2;
-        conn.y2 = nodes[selectedNode].y2;
+        console.log(0);
+        conn.x2 = nodes[selectedNode].x;
+        conn.y2 = nodes[selectedNode].y;
       }
     }
     nodes[selectedNode].x = mouseX;
