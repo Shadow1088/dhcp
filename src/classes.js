@@ -112,9 +112,11 @@ class Node {
     this.x = x;
     this.y = y;
     this.type = type;
-    this.ip = "192.168.1.x";
+    this.ip = "192.168.1." + floor(random(10, 255));
     this.img = IMAGES[type];
     this.interfaces = {}; //"0/1":connection?
+    this.FIB = {};
+    this.receivedFrames = [];
   }
   draw() {
     imageMode(CENTER);
@@ -124,6 +126,19 @@ class Node {
     textAlign(CENTER);
 
     text(this.ip, this.x, this.y + 30);
+  }
+  frames() {
+    for (let i = 0; i < this.receivedFrames; i++) {
+      let frame = this.receivedFrames[i];
+      for (let j = 0; j < frame.protocol.receiverMethods.length; j++) {
+        frame.protocol.receiverMethods[i]();
+      }
+      if (frame.dIP == this.ip) {
+        for (let j = 0; j < frame.protocol.targetMethods.length; j++) {
+          frame.protocol.targetMethods[i]();
+        }
+      }
+    }
   }
 }
 

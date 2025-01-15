@@ -47,6 +47,11 @@ function draw() {
       guibuttons[i].draw();
     }
   }
+
+  for (let i = 0; i < connections.length; i++) {
+    connections[i].draw();
+  }
+
   if (nodes.length) {
     for (let i = 0; i < nodes.length; i++) {
       nodes[i].draw();
@@ -64,20 +69,15 @@ function draw() {
       const key = Object.keys(connections).find((k) => connections[k] === conn); // Find the key for the connection
 
       if (conn.mac1 == mac) {
-        console.log(0);
         conn.x1 = nodes[selectedNode].x;
         conn.y1 = nodes[selectedNode].y;
       } else if (conn.mac2 == mac) {
-        console.log(0);
         conn.x2 = nodes[selectedNode].x;
         conn.y2 = nodes[selectedNode].y;
       }
     }
     nodes[selectedNode].x = mouseX;
     nodes[selectedNode].y = mouseY;
-  }
-  for (let i = 0; i < connections.length; i++) {
-    connections[i].draw();
   }
 }
 
@@ -96,6 +96,7 @@ function mouseClicked() {
   if (action == "connecting") {
     let mac1 = generateMAC();
     let mac2 = generateMAC();
+
     if (tempconn) {
       selectedNode = nodes[selectNode(mouseX, mouseY)];
 

@@ -13,6 +13,7 @@ function generateMAC() {
 // simulates plugging cable into an interface
 function addNodeConnection(node, mac, connection) {
   node.interfaces[mac] = connection;
+  node.FIB[mac] = null;
 }
 
 class Connection {
@@ -35,4 +36,20 @@ class Connection {
   }
 }
 
-class PDU {}
+class Frame {
+  constructor(sIP, dIP, sMAC, dMAC, interfaceMAC, protocol) {
+    this.sIP = sIP;
+    this.dIP = dIP;
+    this.sMAC = sMAC;
+    this.dMAC = dMAC;
+    this.interfaceMAC = interfaceMAC;
+    this.protocol = protocol;
+    this.hops = 0;
+    this.ttl = 20; // Time To Live
+  }
+}
+
+function forwardFrame(nodeIndex, type, frame) {
+  let node = nodes[nodeIndex];
+  let target = type == "broadcast" ? "FF-FF-FF-FF-FF-FF" : frame.dMAC;
+}

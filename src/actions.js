@@ -80,3 +80,7 @@ function selectNode(x, y) {
 function deleteNode(index) {
   nodes.splice(index, 1);
 }
+
+function saveip(ip, nodeIndex) {
+  console.log(ip);
+}
