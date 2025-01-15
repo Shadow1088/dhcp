@@ -63,22 +63,12 @@ function draw() {
       let conn = nodes[selectedNode].interfaces[mac];
       const key = Object.keys(connections).find((k) => connections[k] === conn); // Find the key for the connection
 
-      if (
-        nodes[selectedNode].x == conn.x1 &&
-        nodes[selectedNode].y == conn.y1
-      ) {
-        connections[key].x2 = mouseX;
-        connections[key].y2 = mouseY;
-        conn.x2 = mouseX;
-        conn.y2 = mouseY;
-      } else if (
-        nodes[selectedNode].x == conn.x2 &&
-        nodes[selectedNode].y == conn.y2
-      ) {
-        connections[key].x1 = mouseX;
-        connections[key].y1 = mouseY;
-        conn.x1 = mouseX;
-        conn.y1 = mouseY;
+      if (conn.mac1 == mac) {
+        conn.x1 = nodes[selectedNode].x1;
+        conn.y1 = nodes[selectedNode].y1;
+      } else if (conn.mac2 == mac) {
+        conn.x2 = nodes[selectedNode].x2;
+        conn.y2 = nodes[selectedNode].y2;
       }
     }
     nodes[selectedNode].x = mouseX;
@@ -102,6 +92,8 @@ function mouseClicked() {
     }
   }
   if (action == "connecting") {
+    let mac1 = generateMAC();
+    let mac2 = generateMAC();
     if (tempconn) {
       selectedNode = nodes[selectNode(mouseX, mouseY)];
 
@@ -110,10 +102,12 @@ function mouseClicked() {
         tempconn.y1,
         selectedNode.x,
         selectedNode.y,
+        mac1,
+        mac2,
       );
       connections.push(conn);
-      addNodeConnection(selectedNode, connections.slice(-1)[0]);
-      addNodeConnection(tempconnnode, connections.slice(-1)[0]);
+      addNodeConnection(selectedNode, mac2, connections.slice(-1)[0]);
+      addNodeConnection(tempconnnode, mac1, connections.slice(-1)[0]);
 
       tempconnnode = null;
       tempconn = null;
@@ -121,7 +115,14 @@ function mouseClicked() {
     } else {
       selectedNode = nodes[selectNode(mouseX, mouseY)];
       tempconnnode = selectedNode;
-      tempconn = new Connection(selectedNode.x, selectedNode.y, mouseX, mouseY);
+      tempconn = new Connection(
+        selectedNode.x,
+        selectedNode.y,
+        mouseX,
+        mouseY,
+        mac1,
+        mac2,
+      );
     }
   }
 

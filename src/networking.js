@@ -11,16 +11,18 @@ function generateMAC() {
 }
 
 // simulates plugging cable into an interface
-function addNodeConnection(node, connection) {
-  node.interfaces[generateMAC()] = connection;
+function addNodeConnection(node, mac, connection) {
+  node.interfaces[mac] = connection;
 }
 
 class Connection {
-  constructor(x1, y1, x2, y2) {
+  constructor(x1, y1, x2, y2, mac1, mac2) {
     this.x1 = x1;
     this.y1 = y1;
     this.x2 = x2;
     this.y2 = y2;
+    this.mac1 = mac1;
+    this.mac2 = mac2;
   }
   draw() {
     push();
