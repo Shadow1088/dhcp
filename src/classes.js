@@ -127,8 +127,9 @@ class Node {
 
     text(this.ip, this.x, this.y + 30);
   }
-  frames() {
+  handleFrames() {
     for (let i = 0; i < this.receivedFrames; i++) {
+      // ran
       let frame = this.receivedFrames[i];
       for (let j = 0; j < frame.protocol.receiverMethods.length; j++) {
         frame.protocol.receiverMethods[i]();
@@ -136,6 +137,22 @@ class Node {
       if (frame.dIP == this.ip) {
         for (let j = 0; j < frame.protocol.targetMethods.length; j++) {
           frame.protocol.targetMethods[i]();
+        }
+      }
+    }
+  }
+  forwardFrames(frame) {
+    // if broadcast
+    if (d.IP == "255.255.255.255") {
+      // for every node
+      for (let i = 0; i < nodes.length; i++) {
+        // check its interfaces
+        let conns = Object.keys(nodes[i].interfaces);
+        // is the node connected to this node?
+        for (let j = 0; j < conns.length; j++) {
+          if (conns[j] == this.mac) {
+            nodes[i].receivedFrames.push(frame);
+          }
         }
       }
     }

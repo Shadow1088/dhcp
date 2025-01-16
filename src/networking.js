@@ -37,15 +37,26 @@ class Connection {
 }
 
 class Frame {
-  constructor(sIP, dIP, sMAC, dMAC, interfaceMAC, protocol) {
+  constructor(protocol) {
+    this.sIP = protocol.sIP;
+    this.dIP = protocol.dIP;
+    this.sMAC = protocol.sMAC;
+    this.dMAC = protocol.dMAC;
+    this.interfaceMAC = protocol.interfaceMAC;
+    this.protocol = protocol;
+    this.hops = 0;
+    this.ttl = 20; // Time To Live
+  }
+}
+
+class Protocol {
+  constructor(sIP, dIP, sMAC, dMAC, nodeIndex, interfaceMAC) {
     this.sIP = sIP;
     this.dIP = dIP;
     this.sMAC = sMAC;
     this.dMAC = dMAC;
+    this.nodeIndex = nodeIndex;
     this.interfaceMAC = interfaceMAC;
-    this.protocol = protocol;
-    this.hops = 0;
-    this.ttl = 20; // Time To Live
   }
 }
 
