@@ -7,6 +7,6 @@ function preload() {
 function loadImages() {
   for (let i = 0; i < Object.keys(IMAGES).length; i++) {
     img_name = Object.keys(IMAGES)[i];
-    IMAGES[img_name] = loadImage(`../img/${img_name}.png`);
+    IMAGES[img_name] = loadImage(`/img/${img_name}.png`);
   }
 }
